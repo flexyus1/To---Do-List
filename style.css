@@ -1,0 +1,72 @@
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
+#app {
+  max-width: 600px;
+  margin: 20px auto;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+input[type="text"] {
+  width: 70%;
+  padding: 8px;
+  margin-right: 8px;
+}
+
+button {
+  padding: 8px;
+  cursor: pointer;
+}
+
+button.btnVerde {
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+}
+
+#taskList {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+li.concluido {
+  text-decoration: line-through;
+}
+
+button {
+  background-color: #e74c3c;
+  color: #fff;
+  border: none;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: rgb(53, 187, 53);
+  cursor: not-allowed;
+}
+
+#status {
+  margin-top: 10px;
+  color: #333;
+}
