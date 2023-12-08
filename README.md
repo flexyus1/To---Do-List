@@ -1,1 +1,1 @@
-Primeiro projeto 100% pessoal
+ATT: Tasks are now saved in local storage
