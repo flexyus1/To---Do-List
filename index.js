@@ -1,83 +1,135 @@
-//fazendo uma lista de tarefas
-let elementStatus = document.getElementById("status")
-let elementNumber = 0
+// Carrega os dados do localStorage ao iniciar a página
+document.addEventListener("DOMContentLoaded", function () {
+  loadTasksFromLocalStorage()
+});
 
+//Função para criar novas tasks
 function addTask() {
-  //pegando o elemento pelo seu ID no código HTML
+  //cria uma nova task, e adiciona 1 no contador
   let newTask = document.getElementById("newTask")
-
-  //fazendo com que o valor do input seja igual a oq foi escrito no input
   let inputValue = newTask.value
-
-  //faz com que seja criado um novo elemento li
-  let newElement = document.createElement("li")
-
-  //pega o que foi escrito no inputValue, e tranforma em texto
-  newElement.textContent = inputValue
-
-  //adiciona 1 a contagem de tarefas pendentes
-  elementNumber++
-  taskNumber()
-
-  //pega o id da minha lista, e cria um elemento nela
-  //OBS: sempre que for fazer algo para criar na lista, usar o appendChild COM o myList
   let myList = document.getElementById("taskList")
-  myList.appendChild(newElement)
 
-  //cria um botão de concluir na lista
+  let newElement = document.createElement("li")
+  newElement.textContent = inputValue
+  myList.appendChild(newElement)
+  //-----------------------------------------------------
+
+  //muda o estado do botão de Finish, para Finished, e remove 1 do contador
   let btnFinish = document.createElement("button")
   btnFinish.textContent = "Finish"
-  
   myList.appendChild(btnFinish)
 
-  btnFinish.addEventListener("click", function(){
+  btnFinish.addEventListener("click", function () {
     newElement.classList.add("concluido")
 
-    //se a tarefa for concluida, ele remove 1 de tarefas pendentes
-    if(newElement.classList.contains("concluido")){
-      //desativa o botão assim que a tarefa for marcada como concluida
-      btnFinish.disabled = true
+    btnFinish.disabled = true
+    btnFinish.textContent = "Finished"
 
-      //muda a cor do botão para verde quando a tarefa for finalizada
-      btnFinish.classList.add("btnVerde")
+    //salva as tarefas no local storage depois da conclusão
+    saveTasksToLocalStorage()
+  });
+  //---------------------------------------------------------
 
-      btnFinish.textContent = "Finished"
-      //atualiza o valor de tarefas pendentes
-      elementNumber--
-      taskNumber()
-    }
-    
-  })
 
-  //cria um botão de remover na lista
+  //remove 1 do contador apenas se ele não tiver o estado de finished, e exclui a task
   let btnRemove = document.createElement("button")
   btnRemove.textContent = "Remove"
   myList.appendChild(btnRemove)
 
-  
-  //remove todos os elementos da "li" quando clicar em Remove
-  btnRemove.addEventListener("click", function(){
+  btnRemove.addEventListener("click", function () {
     myList.removeChild(newElement)
     myList.removeChild(btnFinish)
     myList.removeChild(btnRemove)
 
-    //Se o elemento não tiver a classe concluido, ele ira retirar o elemento, e 1 numero
-    if(!newElement.classList.contains("concluido")){
-      elementNumber--
-      taskNumber()
-    }
-
+    saveTasksToLocalStorage()
   })
 
-  //faz com que os novos elementos fiquem em cima, na respectiva ordem em que foram escritos
   myList.insertBefore(btnRemove, myList.firstChild)
   myList.insertBefore(btnFinish, myList.firstChild)
   myList.insertBefore(newElement, myList.firstChild)
 
-  //faz com que a caixa de input se limpe automaticamente depois de criar uma nova tarefa
   newTask.value = ""
+  // Salva as tarefas após adicionar uma nova tarefa
+  saveTasksToLocalStorage()
+  //------------------------------------------------------------
 }
 
-function taskNumber() {
-  elementStatus.textContent = `Pending Tasks: ${elementNumber}`
+// Função para salvar as tarefas no localStorage
+function saveTasksToLocalStorage() {
+  //cria um array vazio
+  let tasks = []
+  //pega os elementos li da task list
+  let taskElements = document.querySelectorAll("#taskList li");
+
+  //pega os elementos e coloca no array vazio que foi criado
+  taskElements.forEach(function (element) {
+  //checa se o botão finish foi acionado ou não
+    let taskData = {
+      content: element.textContent,
+      finished: element.classList.contains("concluido")
+    }
+    tasks.push(taskData)
+  });
+
+  //guarda eles no local storage
+  localStorage.setItem("tasks", JSON.stringify(tasks))
+}
+
+// Função para carregar as tarefas do localStorage
+function loadTasksFromLocalStorage() {
+  //pega as tasks no local storage
+  let storedTasks = localStorage.getItem("tasks")
+
+//pega as tasks armazenas e cria os elemetos li novamente
+  if (storedTasks) {
+    let tasks = JSON.parse(storedTasks)
+    tasks.forEach(function (taskData) {
+      let myList = document.getElementById("taskList")
+
+
+      let newElement = document.createElement("li")
+      newElement.textContent = taskData.content
+//---------------------------------------------------------------
+//se o botão finish foi ativado, ele vai adicionar a classe concluido ao elemento
+      if (taskData.finished) {
+        newElement.classList.add("concluido")
+      }
+//----------------------------------------------------------------
+//recria o botão finish checando se ele estava finalizado ou não
+      let btnFinish = document.createElement("button")
+      btnFinish.textContent = taskData.finished ? "Finished" : "Finish"
+      btnFinish.disabled = taskData.finished
+
+      btnFinish.addEventListener("click", function () {
+        newElement.classList.add("concluido")
+        btnFinish.disabled = true;
+        btnFinish.textContent = "Finished"
+        saveTasksToLocalStorage()
+      });
+//------------------------------------------------------------------
+//recria o botão de remover e retira da local storage quando acionado
+      let btnRemove = document.createElement("button")
+      btnRemove.textContent = "Remove"
+
+      btnRemove.addEventListener("click", function () {
+        myList.removeChild(newElement)
+        myList.removeChild(btnFinish)
+        myList.removeChild(btnRemove)
+
+        saveTasksToLocalStorage()
+      })
+//---------------------------------------------------------------------
+//se o botão finish ja estiver acionado, ele serar recriado ao recarregar a página, desabilitado e acionado
+      if (taskData.finished) {
+        newElement.classList.add("concluido");
+        btnFinish.disabled = true;
+      }
+
+      myList.appendChild(newElement)
+      myList.appendChild(btnFinish)
+      myList.appendChild(btnRemove)
+
+    })
+  }
 }
